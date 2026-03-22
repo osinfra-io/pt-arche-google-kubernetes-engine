@@ -6,9 +6,6 @@
 
 OpenTofu **example** module that provisions a GKE cluster with Workload Identity, KMS encryption for cluster databases and node boot disks, and CIS GKE Benchmark hardening. It supports GKE Fleet host and member project configurations with multi-cluster service discovery and multi-cluster ingress hub features. Namespace-scoped workload identity service accounts are created per namespace, enabling fine-grained IAM bindings for workloads running in the cluster.
 
-> [!NOTE]
-> We do not recommend consuming this module like you might a [public module](https://search.opentofu.org). It is a baseline, something you can fork, potentially maintain, and modify to fit your organization's needs. Using public modules vs. writing your own has various [drivers and trade-offs](https://docs.osinfra.io/fundamentals/architecture-decision-records/adr-0003) that your organization should evaluate.
-
 ## 🔩 Usage
 
 > [!TIP]
