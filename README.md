@@ -33,6 +33,7 @@ Links to documentation and other resources required to develop and iterate in th
 
 - [kubernetes engine](https://cloud.google.com/kubernetes-engine/docs)
   - [multi cluster ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress)
+  - [multi cluster service discovery](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-services)
   - [node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools)
   - [RBAC](https://cloud.google.com/kubernetes-engine/docs/how-to/role-based-access-control)
   - [workload identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity)
