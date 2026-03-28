@@ -11,8 +11,8 @@ data "google_cloud_identity_group_lookup" "registry_readers" {
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/data-sources/container_engine_versions
 
 data "google_container_engine_versions" "this" {
+  location = module.core_helpers.region
   project  = var.project
-  location = module.helpers.region
 }
 
 # Google Project Data Source
@@ -27,7 +27,7 @@ data "google_project" "this" {
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/kms_key_ring
 
 resource "google_kms_key_ring" "cluster_encryption" {
-  location = module.helpers.region
+  location = module.core_helpers.region
   name     = "${local.name}-cluster-encryption-${random_id.this.hex}"
   project  = var.project
 
@@ -89,9 +89,6 @@ resource "google_service_account" "default_node" {
   display_name = "Kubernetes minimum privilege service account for: ${local.name}"
   project      = var.project
 }
-
-# Google GKEHub Membership Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/gke_hub_membership
 
 resource "google_gke_hub_membership" "host" {
   # The GKE API rejects Hub Membership registration while the cluster is running another operation.
@@ -215,9 +212,9 @@ resource "google_container_cluster" "this" {
     dynamic "resource_limits" {
       for_each = local.autoscaling_resource_limits
       content {
-        resource_type = lookup(resource_limits.value, "resource_type")
-        minimum       = lookup(resource_limits.value, "minimum")
-        maximum       = lookup(resource_limits.value, "maximum")
+        maximum       = resource_limits.value.maximum
+        minimum       = resource_limits.value.minimum
+        resource_type = resource_limits.value.resource_type
       }
     }
   }
@@ -246,7 +243,7 @@ resource "google_container_cluster" "this" {
     services_secondary_range_name = "k8s-secondary-services"
   }
 
-  location = module.helpers.region
+  location = module.core_helpers.region
 
   maintenance_policy {
     daily_maintenance_window {

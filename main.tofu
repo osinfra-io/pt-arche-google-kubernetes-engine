@@ -8,7 +8,7 @@ data "google_project" "this" {
 # Google Project IAM Member Resource
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
 
-resource "google_project_iam_member" "container_deployer" {
+resource "google_project_iam_member" "container_deployers" {
   for_each = local.container_deployer_service_accounts
 
   member  = "serviceAccount:${each.value}"
@@ -18,9 +18,6 @@ resource "google_project_iam_member" "container_deployer" {
 
 # This section provides an example MCS configuration involving two existing GKE clusters each in a different Shared VPC service project.
 # https://cloud.google.com/kubernetes-engine/docs/how-to/msc-setup-with-shared-vpc-networks#two-service-projects-iam
-
-# Google Project IAM Member Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
 
 # Create IAM binding granting the fleet host project's GKE Hub service account the GKE Service Agent role on the service cluster's project.
 
@@ -36,9 +33,6 @@ resource "google_project_iam_member" "gke_hub_service_agent" {
 
 # Create IAM binding granting the fleet host project's MCS service account the MCS Service Agent role on the service cluster's project.
 
-# Google Project IAM Member Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
-
 resource "google_project_iam_member" "gke_mcs_service_agent" {
   member  = "serviceAccount:service-${data.google_project.this.number}@gcp-sa-mcsd.iam.gserviceaccount.com"
   project = var.project
@@ -51,9 +45,6 @@ resource "google_project_iam_member" "gke_mcs_service_agent" {
 
 # These resources needs a clusters created first, so new infrastructure builds will fail on the global run.
 # As a W/A run the regional infrastructure first and then the global infrastructure.
-
-# Google Project IAM Member Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
 
 resource "google_project_iam_member" "host_project_network_viewer" {
   lifecycle {
@@ -68,7 +59,7 @@ resource "google_project_iam_member" "host_project_network_viewer" {
 # Google Service Account Resource
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_service_account
 
-resource "google_service_account" "kubernetes_workload_identity" {
+resource "google_service_account" "kubernetes_workload_identities" {
   for_each = var.namespaces
 
   account_id   = "gke-${random_id.this[each.key].hex}-workload-identity"
@@ -89,9 +80,6 @@ resource "google_gke_hub_feature" "multi_cluster_service_discovery" {
   name     = "multiclusterservicediscovery"
   project  = var.project
 }
-
-# Google Project IAM Member Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
 
 resource "google_project_iam_member" "service_project_network_viewer" {
   lifecycle {
@@ -116,10 +104,10 @@ resource "random_id" "this" {
 # Google Service Account IAM Member Resource
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_service_account_iam#google_service_account_iam_member
 
-resource "google_service_account_iam_member" "workload_identity" {
+resource "google_service_account_iam_member" "workload_identities" {
   for_each = var.namespaces
 
   member             = "serviceAccount:${var.project}.svc.id.goog[${each.key}/${each.key}-workload-identity-sa]"
   role               = "roles/iam.workloadIdentityUser"
-  service_account_id = google_service_account.kubernetes_workload_identity[each.key].name
+  service_account_id = google_service_account.kubernetes_workload_identities[each.key].name
 }

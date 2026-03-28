@@ -1,7 +1,7 @@
 # Google Service Account Data Source
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/data-sources/service_account
 
-data "google_service_account" "workload_identity" {
+data "google_service_account" "workload_identities" {
   for_each = var.namespaces
 
   account_id = var.workload_identity_service_account_emails[each.key]
@@ -24,7 +24,7 @@ resource "kubernetes_namespace_v1" "gatekeeper-system" {
 # Kubernetes Role Binding Resource
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/role_binding_v1
 
-resource "kubernetes_role_binding_v1" "namespace_admin" {
+resource "kubernetes_role_binding_v1" "namespace_admins" {
   for_each = local.namespace_admin_service_accounts
 
   metadata {
@@ -47,7 +47,7 @@ resource "kubernetes_role_binding_v1" "namespace_admin" {
 # Kubernetes Role Resource
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/role_v1
 
-resource "kubernetes_role_v1" "namespace_admin" {
+resource "kubernetes_role_v1" "namespace_admins" {
   for_each = var.namespaces
 
   metadata {
@@ -61,9 +61,6 @@ resource "kubernetes_role_v1" "namespace_admin" {
     verbs      = ["create", "delete", "get", "list", "patch", "update", "watch"]
   }
 }
-
-# Kubernetes Namespace Resource
-# https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/namespace_v1
 
 resource "kubernetes_namespace_v1" "this" {
   for_each = merge(
@@ -89,13 +86,13 @@ resource "kubernetes_namespace_v1" "this" {
 # Kubernetes Service Account Resource
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/service_account_v1
 
-resource "kubernetes_service_account_v1" "workload_identity" {
+resource "kubernetes_service_account_v1" "workload_identities" {
   for_each = var.namespaces
 
   metadata {
 
     annotations = {
-      "iam.gke.io/gcp-service-account" = data.google_service_account.workload_identity[each.key].email
+      "iam.gke.io/gcp-service-account" = data.google_service_account.workload_identities[each.key].email
     }
 
     name      = "${each.key}-workload-identity-sa"

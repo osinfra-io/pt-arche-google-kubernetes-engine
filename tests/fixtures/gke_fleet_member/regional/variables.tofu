@@ -2,10 +2,14 @@
 # https://opentofu.org/docs/language/values/variables
 
 variable "enable_gke_hub_host" {
+  description = "Whether to enable GKE Hub host features"
+
   type = bool
 }
 
 variable "gke_hub_memberships" {
+  description = "Map of GKE Hub memberships with their cluster IDs"
+
   type = map(object({
     cluster_id = string
   }))
@@ -13,10 +17,14 @@ variable "gke_hub_memberships" {
 }
 
 variable "master_ipv4_cidr_block" {
+  description = "The IP range in CIDR notation for the hosted master network"
+
   type = string
 }
 
 variable "node_pools" {
+  description = "Map of GKE node pool configurations"
+
   type = map(object({
     auto_repair                              = optional(bool)
     auto_upgrade                             = optional(bool)
@@ -39,9 +47,13 @@ variable "node_pools" {
 }
 
 variable "project" {
+  description = "The Google Cloud project ID"
+
   type = string
 }
 
 variable "vpc_host_project_id" {
+  description = "The project ID of the shared VPC host project"
+
   type = string
 }
