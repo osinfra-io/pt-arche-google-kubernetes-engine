@@ -7,6 +7,16 @@ locals {
   # clarity to the user on what resources are available for autoscaling. You can only have a
   # single resource type of cpu and memory.
 
+  cluster_autoscaling_auto_provisioning_defaults = var.cluster_autoscaling.enabled ? [var.cluster_autoscaling.enabled] : []
+
+  cluster_autoscaling_blue_green_settings = var.cluster_autoscaling.upgrade_settings_strategy == "BLUE_GREEN" ? [var.cluster_autoscaling.upgrade_settings_strategy] : []
+
+  cluster_autoscaling_max_surge = var.cluster_autoscaling.upgrade_settings_strategy == "SURGE" ? var.cluster_autoscaling.upgrade_settings_max_surge : null
+
+  cluster_autoscaling_max_unavailable = var.cluster_autoscaling.upgrade_settings_strategy == "SURGE" ? var.cluster_autoscaling.upgrade_settings_max_unavailable : null
+
+  cluster_autoscaling_upgrade_settings = var.cluster_autoscaling.upgrade_settings_strategy == "SURGE" || var.cluster_autoscaling.upgrade_settings_strategy == "BLUE_GREEN" ? [var.cluster_autoscaling.upgrade_settings_strategy] : []
+
   autoscaling_resource_limits = var.cluster_autoscaling.enabled ? [
     {
       resource_type = "cpu"
