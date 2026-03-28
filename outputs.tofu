@@ -14,6 +14,6 @@ output "gke_fleet_host_project_number" {
 output "workload_identity_service_account_emails" {
   description = "The email addresses of the service accounts for the Kubernetes namespace workload identity"
   value = {
-    for k, v in google_service_account.kubernetes_workload_identity : k => v.email
+    for k, v in google_service_account.kubernetes_workload_identities : k => v.email
   }
 }
