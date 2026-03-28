@@ -36,6 +36,9 @@ resource "google_project_iam_member" "gke_hub_service_agent" {
 
 # Create IAM binding granting the fleet host project's MCS service account the MCS Service Agent role on the service cluster's project.
 
+# Google Project IAM Member Resource
+# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
+
 resource "google_project_iam_member" "gke_mcs_service_agent" {
   member  = "serviceAccount:service-${data.google_project.this.number}@gcp-sa-mcsd.iam.gserviceaccount.com"
   project = var.project
@@ -48,6 +51,9 @@ resource "google_project_iam_member" "gke_mcs_service_agent" {
 
 # These resources needs a clusters created first, so new infrastructure builds will fail on the global run.
 # As a W/A run the regional infrastructure first and then the global infrastructure.
+
+# Google Project IAM Member Resource
+# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
 
 resource "google_project_iam_member" "host_project_network_viewer" {
   lifecycle {

@@ -171,7 +171,7 @@ resource "google_container_cluster" "this" {
     enabled             = var.cluster_autoscaling.enabled
 
     dynamic "auto_provisioning_defaults" {
-      for_each = var.cluster_autoscaling.enabled ? [var.cluster_autoscaling.enabled] : []
+      for_each = local.cluster_autoscaling_auto_provisioning_defaults
 
       content {
         boot_disk_kms_key = google_kms_crypto_key.this["cluster-boot-disk-encryption"].id
@@ -191,13 +191,13 @@ resource "google_container_cluster" "this" {
         }
 
         dynamic "upgrade_settings" {
-          for_each = var.cluster_autoscaling.upgrade_settings_strategy == "SURGE" || var.cluster_autoscaling.upgrade_settings_strategy == "BLUE_GREEN" ? [var.cluster_autoscaling.upgrade_settings_strategy] : []
+          for_each = local.cluster_autoscaling_upgrade_settings
           content {
-            max_surge       = var.cluster_autoscaling.upgrade_settings_strategy == "SURGE" ? var.cluster_autoscaling.upgrade_settings_max_surge : null
-            max_unavailable = var.cluster_autoscaling.upgrade_settings_strategy == "SURGE" ? var.cluster_autoscaling.upgrade_settings_max_unavailable : null
+            max_surge       = local.cluster_autoscaling_max_surge
+            max_unavailable = local.cluster_autoscaling_max_unavailable
 
             dynamic "blue_green_settings" {
-              for_each = var.cluster_autoscaling.upgrade_settings_strategy == "BLUE_GREEN" ? [var.cluster_autoscaling.upgrade_settings_strategy] : []
+              for_each = local.cluster_autoscaling_blue_green_settings
               content {
                 node_pool_soak_duration = var.cluster_autoscaling.upgrade_settings_node_pool_soak_duration
                 standard_rollout_policy {
