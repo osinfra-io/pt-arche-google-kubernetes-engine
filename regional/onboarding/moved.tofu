@@ -15,3 +15,8 @@ moved {
   from = kubernetes_service_account_v1.workload_identity
   to   = kubernetes_service_account_v1.workload_identities
 }
+
+moved {
+  from = module.helpers
+  to   = module.core_helpers
+}
