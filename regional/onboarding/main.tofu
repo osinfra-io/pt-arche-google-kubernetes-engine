@@ -21,6 +21,27 @@ resource "kubernetes_namespace_v1" "gatekeeper-system" {
   }
 }
 
+resource "kubernetes_namespace_v1" "this" {
+  for_each = merge(
+    var.namespaces,
+    {
+      "cert-manager"  = { istio_injection = "disabled" },
+      "datadog"       = { istio_injection = "disabled" },
+      "istio-ingress" = { istio_injection = "enabled" },
+      "istio-system"  = { istio_injection = "disabled" }
+      "istio-test"    = { istio_injection = "enabled" }
+    }
+  )
+
+  metadata {
+    labels = {
+      "istio-injection" = each.value.istio_injection
+    }
+
+    name = each.key
+  }
+}
+
 # Kubernetes Role Binding Resource
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/role_binding_v1
 
@@ -62,27 +83,6 @@ resource "kubernetes_role_v1" "namespace_admins" {
   }
 }
 
-resource "kubernetes_namespace_v1" "this" {
-  for_each = merge(
-    var.namespaces,
-    {
-      "cert-manager"  = { istio_injection = "disabled" },
-      "datadog"       = { istio_injection = "disabled" },
-      "istio-ingress" = { istio_injection = "enabled" },
-      "istio-system"  = { istio_injection = "disabled" }
-      "istio-test"    = { istio_injection = "enabled" }
-    }
-  )
-
-  metadata {
-    labels = {
-      "istio-injection" = each.value.istio_injection
-    }
-
-    name = each.key
-  }
-}
-
 # Kubernetes Service Account Resource
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/service_account_v1
 
@@ -90,7 +90,6 @@ resource "kubernetes_service_account_v1" "workload_identities" {
   for_each = var.namespaces
 
   metadata {
-
     annotations = {
       "iam.gke.io/gcp-service-account" = data.google_service_account.workload_identities[each.key].email
     }

@@ -1,137 +1,3 @@
-# Google Cloud Identity Group Lookup Data Source
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/data-sources/cloud_identity_group_lookup
-
-data "google_cloud_identity_group_lookup" "registry_readers" {
-  group_key {
-    id = "${var.cluster_prefix}-registry-readers@osinfra.io"
-  }
-}
-
-# Google Container Engine Versions Data Source
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/data-sources/container_engine_versions
-
-data "google_container_engine_versions" "this" {
-  location = module.core_helpers.region
-  project  = var.project
-}
-
-# Google Project Data Source
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/data-sources/project
-
-data "google_project" "this" {
-  project_id = var.project
-}
-
-
-# KMS Key Ring Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/kms_key_ring
-
-resource "google_kms_key_ring" "cluster_encryption" {
-  location = module.core_helpers.region
-  name     = "${local.name}-cluster-encryption-${random_id.this.hex}"
-  project  = var.project
-
-  # We can't use the lifecycle block to prevent destroy on this resource for testing purposes.
-
-  # KeyRings cannot be deleted from Google Cloud Platform. Destroying a OpenTofu-managed KeyRing will remove it from
-  # state but will not delete the resource from the project.
-
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
-}
-
-# Google GKEHub Membership Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/gke_hub_membership
-
-# This is the resource for registering clusters to the GKE Hub.
-
-resource "google_gke_hub_membership" "clusters" {
-  for_each = local.gke_hub_memberships
-
-  authority {
-    issuer = "https://container.googleapis.com/v1/${each.value.cluster_id}"
-  }
-
-  endpoint {
-    gke_cluster {
-      resource_link = each.value.cluster_id
-    }
-  }
-
-  labels        = var.labels
-  membership_id = each.key
-  project       = var.project
-}
-
-# CIS GKE Benchmark Recommendation: 6.2.1. Prefer not running GKE clusters using the Compute Engine
-# default service account
-
-# You should create and use a minimally privileged service account for your nodes to use instead of the
-# Compute Engine default service account.
-
-# https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster#use_least_privilege_sa
-
-# Project IAM Member Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam_member
-
-resource "google_project_iam_member" "default_node" {
-  member  = "serviceAccount:${google_service_account.default_node.email}"
-  project = var.project
-  role    = "roles/container.defaultNodeServiceAccount"
-}
-
-# Service Account Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_service_account
-
-resource "google_service_account" "default_node" {
-  account_id   = "gke-${random_id.this.hex}"
-  display_name = "Kubernetes minimum privilege service account for: ${local.name}"
-  project      = var.project
-}
-
-resource "google_gke_hub_membership" "host" {
-  # The GKE API rejects Hub Membership registration while the cluster is running another operation.
-  # Node pool creation starts concurrently with this resource after the cluster is ready, so we must
-  # wait for all node pools to finish before attempting registration.
-
-  depends_on = [google_container_node_pool.this]
-
-  lifecycle {
-    enabled = var.enable_gke_hub_host
-  }
-
-  endpoint {
-    gke_cluster {
-      resource_link = google_container_cluster.this.id
-    }
-  }
-
-  labels        = var.labels
-  membership_id = google_container_cluster.this.name
-  project       = var.project
-}
-
-# Google GKEHub Feature Resource
-# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/gke_hub_feature
-
-resource "google_gke_hub_feature" "multi_cluster_ingress" {
-  lifecycle {
-    enabled = var.enable_gke_hub_host
-  }
-
-  labels   = var.labels
-  location = "global"
-  name     = "multiclusteringress"
-  project  = var.project
-
-  spec {
-    multiclusteringress {
-      config_membership = google_gke_hub_membership.host.name
-    }
-  }
-}
-
 # Google Cloud Identity Group Membership
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/cloud_identity_group_membership
 
@@ -385,6 +251,71 @@ resource "google_container_node_pool" "this" {
   }
 }
 
+# Google GKEHub Feature Resource
+# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/gke_hub_feature
+
+resource "google_gke_hub_feature" "multi_cluster_ingress" {
+  lifecycle {
+    enabled = var.enable_gke_hub_host
+  }
+
+  labels   = var.labels
+  location = "global"
+  name     = "multiclusteringress"
+  project  = var.project
+
+  spec {
+    multiclusteringress {
+      config_membership = google_gke_hub_membership.host.name
+    }
+  }
+}
+
+# Google GKEHub Membership Resource
+# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/gke_hub_membership
+
+# This is the resource for registering clusters to the GKE Hub.
+
+resource "google_gke_hub_membership" "clusters" {
+  for_each = local.gke_hub_memberships
+
+  authority {
+    issuer = "https://container.googleapis.com/v1/${each.value.cluster_id}"
+  }
+
+  endpoint {
+    gke_cluster {
+      resource_link = each.value.cluster_id
+    }
+  }
+
+  labels        = var.labels
+  membership_id = each.key
+  project       = var.project
+}
+
+resource "google_gke_hub_membership" "host" {
+  # The GKE API rejects Hub Membership registration while the cluster is running another operation.
+  # Node pool creation starts concurrently with this resource after the cluster is ready, so we must
+  # wait for all node pools to finish before attempting registration.
+
+  depends_on = [google_container_node_pool.this]
+
+  lifecycle {
+    enabled = var.enable_gke_hub_host
+  }
+
+  endpoint {
+    gke_cluster {
+      resource_link = google_container_cluster.this.id
+    }
+  }
+
+  labels        = var.labels
+  membership_id = google_container_cluster.this.name
+  project       = var.project
+}
+
 # KMS CryptoKey Resource
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/kms_crypto_key
 
@@ -418,6 +349,50 @@ resource "google_kms_crypto_key_iam_member" "this" {
   crypto_key_id = google_kms_crypto_key.this[each.key].id
   member        = each.value.service_account
   role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+}
+
+# KMS Key Ring Resource
+# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/kms_key_ring
+
+resource "google_kms_key_ring" "cluster_encryption" {
+  location = module.core_helpers.region
+  name     = "${local.name}-cluster-encryption-${random_id.this.hex}"
+  project  = var.project
+
+  # We can't use the lifecycle block to prevent destroy on this resource for testing purposes.
+
+  # KeyRings cannot be deleted from Google Cloud Platform. Destroying a OpenTofu-managed KeyRing will remove it from
+  # state but will not delete the resource from the project.
+
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+}
+
+# CIS GKE Benchmark Recommendation: 6.2.1. Prefer not running GKE clusters using the Compute Engine
+# default service account
+
+# You should create and use a minimally privileged service account for your nodes to use instead of the
+# Compute Engine default service account.
+
+# https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster#use_least_privilege_sa
+
+# Google Project IAM Member Resource
+# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
+
+resource "google_project_iam_member" "default_node" {
+  member  = "serviceAccount:${google_service_account.default_node.email}"
+  project = var.project
+  role    = "roles/container.defaultNodeServiceAccount"
+}
+
+# Google Service Account Resource
+# https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_service_account
+
+resource "google_service_account" "default_node" {
+  account_id   = "gke-${random_id.this.hex}"
+  display_name = "Kubernetes minimum privilege service account for: ${local.name}"
+  project      = var.project
 }
 
 # Random ID Resource
