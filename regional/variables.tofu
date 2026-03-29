@@ -2,6 +2,7 @@
 # https://opentofu.org/docs/language/values/variables
 
 variable "cluster_autoscaling" {
+  default     = {}
   description = "Per-cluster configuration of node auto-provisioning with cluster autoscaler to automatically adjust the size of the cluster and create/delete node pools based on the current needs of the cluster's workload"
   type = object({
     autoscaling_profile                      = optional(string, "OPTIMIZE_UTILIZATION")
@@ -9,19 +10,18 @@ variable "cluster_autoscaling" {
     enabled                                  = optional(bool, false)
     image_type                               = optional(string)
     oauth_scopes                             = optional(list(string), ["https://www.googleapis.com/auth/cloud-platform"])
-    resource_limits_min_cpu_cores            = optional(number, 0)
-    resource_limits_min_memory_gb            = optional(number, 0)
     resource_limits_max_cpu_cores            = optional(number, 6)
     resource_limits_max_memory_gb            = optional(number, 32)
+    resource_limits_min_cpu_cores            = optional(number, 0)
+    resource_limits_min_memory_gb            = optional(number, 0)
     upgrade_settings_batch_node_count        = optional(number)
     upgrade_settings_batch_percentage        = optional(number)
     upgrade_settings_batch_soak_duration     = optional(string)
-    upgrade_settings_node_pool_soak_duration = optional(string)
     upgrade_settings_max_surge               = optional(number)
     upgrade_settings_max_unavailable         = optional(number, 1) # https://github.com/hashicorp/terraform-provider-google/issues/17164
+    upgrade_settings_node_pool_soak_duration = optional(string)
     upgrade_settings_strategy                = optional(string, "SURGE")
   })
-  default = {}
 }
 
 variable "cluster_prefix" {
@@ -34,35 +34,35 @@ variable "cluster_prefix" {
 }
 
 variable "daily_maintenance_window" {
+  default     = "06:00"
   description = "Time window specified for daily maintenance operations"
   type        = string
-  default     = "06:00"
 }
 
 variable "enable_deletion_protection" {
+  default     = true
   description = "Whether or not to enable deletion protection on the cluster"
   type        = bool
-  default     = true
 }
 
 variable "enable_gke_hub_host" {
+  default     = false
   description = "Whether or not to enable GKE Hub Host"
   type        = bool
-  default     = false
 }
 
 variable "gke_hub_memberships" {
+  default     = {}
   description = "The map of GKE Hub Memberships to create"
   type = map(object({
     cluster_id = string
   }))
-  default = {}
 }
 
 variable "labels" {
+  default     = {}
   description = "A map of key/value pairs to assign to the resources being created"
   type        = map(string)
-  default     = {}
 }
 
 variable "master_ipv4_cidr_block" {
@@ -71,12 +71,13 @@ variable "master_ipv4_cidr_block" {
 }
 
 variable "network" {
+  default     = "standard-shared"
   description = "The name or self_link of the Google Compute Engine network to which the cluster is connected"
   type        = string
-  default     = "standard-shared"
 }
 
 variable "node_pools" {
+  default     = {}
   description = "The node pools to create in the cluster"
   type = map(object({
     auto_repair                              = optional(bool)
@@ -92,12 +93,11 @@ variable "node_pools" {
     upgrade_settings_batch_node_count        = optional(number)
     upgrade_settings_batch_percentage        = optional(number)
     upgrade_settings_batch_soak_duration     = optional(string)
-    upgrade_settings_node_pool_soak_duration = optional(string)
     upgrade_settings_max_surge               = optional(number)
     upgrade_settings_max_unavailable         = optional(number, 1) # https://github.com/hashicorp/terraform-provider-google/issues/17164
+    upgrade_settings_node_pool_soak_duration = optional(string)
     upgrade_settings_strategy                = optional(string, "SURGE")
   }))
-  default = {}
 }
 
 variable "project" {
@@ -106,15 +106,15 @@ variable "project" {
 }
 
 variable "release_channel" {
+  default     = "REGULAR"
   description = "Configuration options for the Release channel feature, which provide more control over automatic upgrades of your GKE clusters"
   type        = string
-  default     = "REGULAR"
 }
 
 variable "resource_labels" {
+  default     = {}
   description = "The GCP labels (key/value pairs) to be applied to each node"
   type        = map(string)
-  default     = {}
 }
 
 variable "subnet" {
