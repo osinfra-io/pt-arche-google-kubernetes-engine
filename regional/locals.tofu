@@ -51,7 +51,7 @@ locals {
   network        = "projects/${var.vpc_host_project_id}/global/networks/${var.network}"
   node_locations = module.core_helpers.zone != null ? ["${module.core_helpers.region}-${module.core_helpers.zone}"] : null
 
-  private_endpoint_subnetwork = var.private_endpoint_subnetwork != "" ? "projects/${var.vpc_host_project_id}/regions/${module.core_helpers.region}/subnetworks/${var.private_endpoint_subnetwork}" : null
+  private_endpoint_subnetwork = "projects/${var.vpc_host_project_id}/regions/${module.core_helpers.region}/subnetworks/${var.private_endpoint_subnetwork}"
 
   subnet = "projects/${var.vpc_host_project_id}/regions/${module.core_helpers.region}/subnetworks/${var.subnet}"
 }

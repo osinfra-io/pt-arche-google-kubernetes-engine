@@ -65,11 +65,6 @@ variable "labels" {
   type        = map(string)
 }
 
-variable "master_ipv4_cidr_block" {
-  description = "The IP range in CIDR notation to use for the hosted master network"
-  type        = string
-}
-
 variable "network" {
   default     = "standard-shared"
   description = "The name or self_link of the Google Compute Engine network to which the cluster is connected"
@@ -79,7 +74,6 @@ variable "network" {
 variable "node_pools" {
   default     = {}
   description = "The node pools to create in the cluster"
-
   type = map(object({
     auto_repair                              = optional(bool)
     auto_upgrade                             = optional(bool)
@@ -102,8 +96,7 @@ variable "node_pools" {
 }
 
 variable "private_endpoint_subnetwork" {
-  default     = ""
-  description = "The name of the subnetwork in which the cluster's master endpoint will be created; leave empty to omit"
+  description = "The name of the subnetwork in which the cluster's master endpoint will be created"
   type        = string
 }
 
