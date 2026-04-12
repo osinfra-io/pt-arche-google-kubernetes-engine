@@ -133,10 +133,14 @@ resource "google_container_cluster" "this" {
 
     enable_components = [
       "APISERVER",
+      "CADVISOR",
       "CONTROLLER_MANAGER",
       "DAEMONSET",
+      "DCGM",
       "DEPLOYMENT",
       "HPA",
+      "JOBSET",
+      "KUBELET",
       "POD",
       "SCHEDULER",
       "STATEFULSET",
