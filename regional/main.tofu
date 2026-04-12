@@ -168,7 +168,8 @@ resource "google_container_cluster" "this" {
       enabled = true
     }
 
-    master_ipv4_cidr_block = var.master_ipv4_cidr_block
+    master_ipv4_cidr_block      = var.master_ipv4_cidr_block
+    private_endpoint_subnetwork = local.private_endpoint_subnetwork
   }
 
   project = var.project

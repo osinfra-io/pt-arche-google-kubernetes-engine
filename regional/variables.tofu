@@ -79,6 +79,7 @@ variable "network" {
 variable "node_pools" {
   default     = {}
   description = "The node pools to create in the cluster"
+
   type = map(object({
     auto_repair                              = optional(bool)
     auto_upgrade                             = optional(bool)
@@ -98,6 +99,12 @@ variable "node_pools" {
     upgrade_settings_node_pool_soak_duration = optional(string)
     upgrade_settings_strategy                = optional(string, "SURGE")
   }))
+}
+
+variable "private_endpoint_subnetwork" {
+  default     = ""
+  description = "The name of the subnetwork in which the cluster's master endpoint will be created; leave empty to omit"
+  type        = string
 }
 
 variable "project" {
