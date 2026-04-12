@@ -24,10 +24,10 @@ module "test" {
     "mock-key" = "mock-value"
   }
 
-  master_ipv4_cidr_block = var.master_ipv4_cidr_block
-  network                = "mock-network"
-  node_pools             = var.node_pools
-  project                = var.project
+  network                     = "mock-network"
+  node_pools                  = var.node_pools
+  private_endpoint_subnetwork = "mock-master-subnet"
+  project                     = var.project
 
   resource_labels = {
     region = "mock-region"

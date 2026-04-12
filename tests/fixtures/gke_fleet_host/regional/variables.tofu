@@ -16,12 +16,6 @@ variable "gke_hub_memberships" {
   default = {}
 }
 
-variable "master_ipv4_cidr_block" {
-  description = "The IP range in CIDR notation for the hosted master network"
-
-  type = string
-}
-
 variable "node_pools" {
   description = "Map of GKE node pool configurations"
 

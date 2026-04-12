@@ -133,10 +133,14 @@ resource "google_container_cluster" "this" {
 
     enable_components = [
       "APISERVER",
+      "CADVISOR",
       "CONTROLLER_MANAGER",
       "DAEMONSET",
+      "DCGM",
       "DEPLOYMENT",
       "HPA",
+      "JOBSET",
+      "KUBELET",
       "POD",
       "SCHEDULER",
       "STATEFULSET",
@@ -168,7 +172,7 @@ resource "google_container_cluster" "this" {
       enabled = true
     }
 
-    master_ipv4_cidr_block = var.master_ipv4_cidr_block
+    private_endpoint_subnetwork = local.private_endpoint_subnetwork
   }
 
   project = var.project
