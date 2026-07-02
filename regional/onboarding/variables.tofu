@@ -3,11 +3,11 @@
 
 variable "namespaces" {
   default     = {}
-  description = "A map of namespaces with the Google service account used for the namespace administrator and whether Istio injection is enabled or disabled"
+  description = "A map of namespaces with an optional Google service account used for the namespace administrator and whether Istio injection is enabled or disabled. When google_service_account is null, the namespace-admin Role and RoleBinding are skipped."
 
   type = map(object({
     annotations                  = optional(map(string))
-    google_service_account       = string
+    google_service_account       = optional(string, null)
     istio_control_plane_clusters = optional(string)
     istio_injection              = optional(string, "disabled")
   }))
