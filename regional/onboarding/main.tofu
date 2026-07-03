@@ -46,11 +46,11 @@ resource "kubernetes_namespace_v1" "this" {
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/role_binding_v1
 
 resource "kubernetes_role_binding_v1" "namespace_admins" {
-  for_each = local.namespace_admin_service_accounts
+  for_each = var.namespaces
 
   metadata {
     name      = "namespace-admin"
-    namespace = kubernetes_namespace_v1.this[each.value.namespace].metadata.0.name
+    namespace = kubernetes_namespace_v1.this[each.key].metadata.0.name
   }
 
   role_ref {
@@ -61,7 +61,7 @@ resource "kubernetes_role_binding_v1" "namespace_admins" {
 
   subject {
     kind = "User"
-    name = each.value.service_account
+    name = each.value.google_service_account
   }
 }
 
@@ -69,7 +69,7 @@ resource "kubernetes_role_binding_v1" "namespace_admins" {
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/role_v1
 
 resource "kubernetes_role_v1" "namespace_admins" {
-  for_each = { for k, v in var.namespaces : k => v if v.google_service_account != null }
+  for_each = var.namespaces
 
   metadata {
     name      = "namespace-admin"
