@@ -7,5 +7,6 @@ locals {
       namespace       = k,
       service_account = v.google_service_account
     }
+    if v.google_service_account != null
   }
 }

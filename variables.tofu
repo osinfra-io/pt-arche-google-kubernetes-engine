@@ -15,9 +15,9 @@ variable "labels" {
 
 variable "namespaces" {
   default     = {}
-  description = "A map of namespaces with the Google service account used for the namespace administrator and whether Istio injection is enabled or disabled"
+  description = "A map of namespaces with an optional Google service account used for the namespace administrator and whether Istio injection is enabled or disabled"
   type = map(object({
-    google_service_account = string
+    google_service_account = optional(string, null)
     istio_injection        = optional(string, "disabled")
   }))
 }

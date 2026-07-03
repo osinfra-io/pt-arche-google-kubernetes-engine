@@ -69,7 +69,7 @@ resource "kubernetes_role_binding_v1" "namespace_admins" {
 # https://search.opentofu.org/provider/hashicorp/kubernetes/latest/docs/resources/role_v1
 
 resource "kubernetes_role_v1" "namespace_admins" {
-  for_each = var.namespaces
+  for_each = { for k, v in var.namespaces : k => v if v.google_service_account != null }
 
   metadata {
     name      = "namespace-admin"
