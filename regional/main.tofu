@@ -101,10 +101,15 @@ resource "google_container_cluster" "this" {
 
   # Enables the Kubernetes Gateway API. GKE installs and manages the Gateway API CRDs on the
   # cluster; Istio's istiod reconciles Gateway resources with gatewayClassName "istio" against
-  # them. Required for the Istio ingress migration to Gateway API (Gateway / HTTPRoute).
+  # them. Required for the Istio ingress migration to Gateway API (Gateway / HTTPRoute). Only
+  # enabled on clusters that host Gateway resources (the pneuma gateway clusters).
 
-  gateway_api_config {
-    channel = "CHANNEL_STANDARD"
+  dynamic "gateway_api_config" {
+    for_each = var.enable_gateway_api ? [1] : []
+
+    content {
+      channel = "CHANNEL_STANDARD"
+    }
   }
 
   # If you're using google_container_node_pool objects with no default node pool, you'll need to set this to a value
