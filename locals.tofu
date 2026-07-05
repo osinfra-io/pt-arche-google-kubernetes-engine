@@ -4,6 +4,7 @@
 locals {
   container_deployer_service_accounts = toset(distinct([
     for k in values(var.namespaces) : k.google_service_account
+    if k.google_service_account != null
   ]))
 
   fleet_host_project_id     = local.is_fleet_host ? var.project : var.gke_fleet_host_project_id
