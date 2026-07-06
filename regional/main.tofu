@@ -22,13 +22,6 @@ resource "google_container_cluster" "this" {
       # For more control over which auto-upgrades your cluster and its nodes receive, you can enroll it in a release channel.
 
       min_master_version,
-
-      # The GCP API returns enable_components in a different order than configured. The provider treats
-      # this as an ordered list (TypeList) rather than a set, causing a perpetual diff on every plan even
-      # when the actual set of components is unchanged. Ignore until the provider fixes the comparison.
-      # https://github.com/osinfra-io/pt-arche-google-kubernetes-engine/issues/150
-
-      monitoring_config
     ]
   }
 
@@ -152,20 +145,20 @@ resource "google_container_cluster" "this" {
     }
 
     enable_components = [
+      "SYSTEM_COMPONENTS",
       "APISERVER",
-      "CADVISOR",
-      "CONTROLLER_MANAGER",
-      "DAEMONSET",
-      "DCGM",
-      "DEPLOYMENT",
-      "HPA",
-      "JOBSET",
-      "KUBELET",
-      "POD",
       "SCHEDULER",
-      "STATEFULSET",
+      "CONTROLLER_MANAGER",
       "STORAGE",
-      "SYSTEM_COMPONENTS"
+      "HPA",
+      "POD",
+      "DAEMONSET",
+      "DEPLOYMENT",
+      "STATEFULSET",
+      "CADVISOR",
+      "KUBELET",
+      "DCGM",
+      "JOBSET",
     ]
   }
 
