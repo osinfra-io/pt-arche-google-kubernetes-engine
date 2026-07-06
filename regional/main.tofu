@@ -21,7 +21,7 @@ resource "google_container_cluster" "this" {
       # Cluster master version is managed by the release channel. Google upgrades clusters and nodes automatically.
       # For more control over which auto-upgrades your cluster and its nodes receive, you can enroll it in a release channel.
 
-      min_master_version
+      min_master_version,
     ]
   }
 
@@ -99,6 +99,19 @@ resource "google_container_cluster" "this" {
   enable_intranode_visibility = true
   enable_shielded_nodes       = true
 
+  # Enables the Kubernetes Gateway API. GKE installs and manages the Gateway API CRDs on the
+  # cluster; Istio's istiod reconciles Gateway resources with gatewayClassName "istio" against
+  # them. Required for the Istio ingress migration to Gateway API (Gateway / HTTPRoute). Only
+  # enabled on clusters that host Gateway resources (the pneuma gateway clusters).
+
+  dynamic "gateway_api_config" {
+    for_each = var.enable_gateway_api ? [1] : []
+
+    content {
+      channel = "CHANNEL_STANDARD"
+    }
+  }
+
   # If you're using google_container_node_pool objects with no default node pool, you'll need to set this to a value
   # of at least 1, alongside setting remove_default_node_pool to true.
 
@@ -132,20 +145,20 @@ resource "google_container_cluster" "this" {
     }
 
     enable_components = [
+      "SYSTEM_COMPONENTS",
       "APISERVER",
-      "CADVISOR",
-      "CONTROLLER_MANAGER",
-      "DAEMONSET",
-      "DCGM",
-      "DEPLOYMENT",
-      "HPA",
-      "JOBSET",
-      "KUBELET",
-      "POD",
       "SCHEDULER",
-      "STATEFULSET",
+      "CONTROLLER_MANAGER",
       "STORAGE",
-      "SYSTEM_COMPONENTS"
+      "HPA",
+      "POD",
+      "DAEMONSET",
+      "DEPLOYMENT",
+      "STATEFULSET",
+      "CADVISOR",
+      "KUBELET",
+      "DCGM",
+      "JOBSET",
     ]
   }
 

@@ -45,6 +45,12 @@ variable "enable_deletion_protection" {
   type        = bool
 }
 
+variable "enable_gateway_api" {
+  default     = false
+  description = "Whether or not to enable the Kubernetes Gateway API on the cluster"
+  type        = bool
+}
+
 variable "enable_gke_hub_host" {
   default     = false
   description = "Whether or not to enable GKE Hub Host"
