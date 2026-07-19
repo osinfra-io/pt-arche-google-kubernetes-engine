@@ -145,20 +145,20 @@ resource "google_container_cluster" "this" {
     }
 
     enable_components = [
-      "SYSTEM_COMPONENTS",
       "APISERVER",
-      "SCHEDULER",
-      "CONTROLLER_MANAGER",
-      "STORAGE",
-      "HPA",
-      "POD",
-      "DAEMONSET",
-      "DEPLOYMENT",
-      "STATEFULSET",
       "CADVISOR",
-      "KUBELET",
+      "CONTROLLER_MANAGER",
+      "DAEMONSET",
       "DCGM",
+      "DEPLOYMENT",
+      "HPA",
       "JOBSET",
+      "KUBELET",
+      "POD",
+      "SCHEDULER",
+      "STATEFULSET",
+      "STORAGE",
+      "SYSTEM_COMPONENTS",
     ]
   }
 
