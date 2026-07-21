@@ -135,6 +135,7 @@ variables {
     namespace-a = {
       google_service_account = "mock-github@mock.gserviceaccount.com"
       istio_injection        = "enabled"
+      route_prefix           = "mock-a"
     }
     namespace-b = {
       google_service_account = "mock-github@mock.gserviceaccount.com"

@@ -3,13 +3,14 @@
 
 variable "namespaces" {
   default     = {}
-  description = "A map of namespaces with the Google service account bound as the namespace administrator and whether Istio injection is enabled or disabled. A namespace-admin Role and RoleBinding are always created for the service account."
+  description = "A map of namespaces with the Google service account bound as the namespace administrator and whether Istio injection is enabled or disabled. A namespace-admin Role and RoleBinding are always created for the service account. When route_prefix is set, the osinfra.io/route-prefix label is applied so the namespace can attach HTTPRoutes to its team's shared gateway listener."
 
   type = map(object({
     annotations                  = optional(map(string))
     google_service_account       = string
     istio_control_plane_clusters = optional(string)
     istio_injection              = optional(string, "disabled")
+    route_prefix                 = optional(string)
   }))
 }
 
