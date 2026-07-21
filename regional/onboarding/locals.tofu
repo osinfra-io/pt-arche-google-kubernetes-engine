@@ -13,7 +13,6 @@ locals {
     "datadog"       = { istio_injection = "disabled", route_prefix = null }
     "istio-ingress" = { istio_injection = "enabled", route_prefix = null }
     "istio-system"  = { istio_injection = "disabled", route_prefix = null }
-    "istio-test"    = { istio_injection = "enabled", route_prefix = var.istio_test_route_prefix }
   }
 
   # Team namespaces normalized to the fields used for namespace creation.

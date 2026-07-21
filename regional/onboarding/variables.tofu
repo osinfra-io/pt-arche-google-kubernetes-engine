@@ -1,12 +1,6 @@
 # Input Variables
 # https://opentofu.org/docs/language/values/variables
 
-variable "istio_test_route_prefix" {
-  description = "The osinfra.io/route-prefix label value applied to the internal istio-test namespace, so its HTTPRoutes attach to the owning team's shared gateway listener. Null (the default) leaves the namespace unlabeled."
-  type        = string
-  default     = null
-}
-
 variable "namespaces" {
   default     = {}
   description = "A map of namespaces with the Google service account bound as the namespace administrator and whether Istio injection is enabled or disabled. A namespace-admin Role and RoleBinding are always created for the service account. When route_prefix is set, the osinfra.io/route-prefix label is applied so the namespace can attach HTTPRoutes to its team's shared gateway listener."
