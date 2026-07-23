@@ -22,10 +22,20 @@ resource "kubernetes_namespace_v1" "gatekeeper-system" {
 }
 
 resource "kubernetes_namespace_v1" "this" {
-  for_each = local.namespaces
+  for_each = merge(
+    var.namespaces,
+    {
+      "cert-manager"  = { istio_injection = "disabled" },
+      "datadog"       = { istio_injection = "disabled" },
+      "istio-ingress" = { istio_injection = "enabled" },
+      "istio-system"  = { istio_injection = "disabled" }
+    }
+  )
 
   metadata {
-    labels = local.namespace_labels[each.key]
+    labels = {
+      "istio-injection" = each.value.istio_injection
+    }
 
     name = each.key
   }
