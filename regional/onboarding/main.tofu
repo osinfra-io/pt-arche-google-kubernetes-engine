@@ -31,6 +31,16 @@ resource "kubernetes_namespace_v1" "this" {
     }
   )
 
+  # The Istio workspace labels istio-system with its cluster-specific logical network
+  # (topology.istio.io/network) for ambient multi-network multicluster. That label is owned by
+  # the Istio layer, not onboarding — without ignoring it here, every plan tries to strip it,
+  # causing permanent drift between the two workspaces.
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels["topology.istio.io/network"]
+    ]
+  }
+
   metadata {
     # Sidecar injection is opt-in in Istio: a namespace with no "istio-injection" label already
     # gets no sidecar, so it's omitted here entirely for an ambient-only mesh. "istio-ingress" is
