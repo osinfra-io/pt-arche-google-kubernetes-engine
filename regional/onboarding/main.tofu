@@ -25,17 +25,21 @@ resource "kubernetes_namespace_v1" "this" {
   for_each = merge(
     var.namespaces,
     {
-      "cert-manager"  = { istio_injection = "disabled" },
-      "datadog"       = { istio_injection = "disabled" },
-      "istio-ingress" = { istio_injection = "enabled" },
-      "istio-system"  = { istio_injection = "disabled" }
+      "cert-manager"  = { mesh_enabled = false },
+      "datadog"       = { mesh_enabled = false },
+      "istio-ingress" = { mesh_enabled = false },
+      "istio-system"  = { mesh_enabled = false }
     }
   )
 
   metadata {
-    labels = {
-      "istio-injection" = each.value.istio_injection
-    }
+    # "istio-ingress" keeps the classic injection label regardless of mesh_enabled — it triggers
+    # istiod's auto-provisioned gateway deployment for the Gateway API resource in that namespace,
+    # which is unrelated to ambient enrollment for team workload namespaces.
+    labels = merge(
+      { "istio-injection" = each.key == "istio-ingress" ? "enabled" : "disabled" },
+      each.value.mesh_enabled ? { "istio.io/dataplane-mode" = "ambient" } : {}
+    )
 
     name = each.key
   }
