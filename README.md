@@ -4,9 +4,19 @@
 
 ## Repository Description
 
-OpenTofu **example** module that provisions a GKE cluster with Workload Identity, KMS encryption for cluster databases and node boot disks, and CIS GKE Benchmark hardening. It supports GKE Fleet host and member project configurations with multi-cluster service discovery and multi-cluster ingress hub features. Namespace-scoped workload identity service accounts are created per namespace, enabling fine-grained IAM bindings for workloads running in the cluster.
+Reusable OpenTofu child module that provisions a GKE cluster with Workload Identity, KMS encryption for cluster databases and node boot disks, and CIS GKE Benchmark hardening. It supports GKE Fleet host and member project configurations with multi-cluster service discovery and multi-cluster ingress hub features. Namespace-scoped workload identity service accounts are created per namespace, enabling fine-grained IAM bindings for workloads running in the cluster.
 
 ## 🔩 Usage
+
+### Module interfaces
+
+| Source path | Purpose | Interface |
+| --- | --- | --- |
+| Repository root | Creates fleet-level IAM, workload identity service accounts, and multi-cluster service discovery configuration. | [`variables.tofu`](variables.tofu) · [`outputs.tofu`](outputs.tofu) |
+| `//regional` | Creates the private GKE cluster, node pools, KMS keys, node service account, and optional fleet-host resources. | [`regional/variables.tofu`](regional/variables.tofu) · [`regional/outputs.tofu`](regional/outputs.tofu) |
+| `//regional/onboarding` | Creates namespaces, namespace-admin RBAC, workload identity Kubernetes service accounts, and optional ambient-mesh labels. | [`regional/onboarding/variables.tofu`](regional/onboarding/variables.tofu) |
+
+Regional clusters default to the `REGULAR` release channel with deletion protection, private nodes, Workload Identity, Shielded Nodes, Advanced Datapath, GKE cost allocation, and CMEK for cluster databases and node boot disks. Gateway API, fleet-host behavior, node pools, and node auto-provisioning are opt-in. KMS keys can make cluster data unrecoverable if their key versions are destroyed, and the child module cannot enforce consumer-side lifecycle protection. GKE clusters, nodes, control-plane features, logging/monitoring, and KMS usage incur GCP costs.
 
 > [!TIP]
 > You can check the [tests/fixtures](tests/fixtures) directory for example configurations. These fixtures set up the system for testing by providing all the necessary initial code, thus creating good examples on which to base your configurations.
