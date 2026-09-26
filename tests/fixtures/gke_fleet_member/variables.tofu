@@ -18,7 +18,7 @@ variable "namespaces" {
 
   type = map(object({
     google_service_account = string
-    istio_injection        = optional(string, "disabled")
+    mesh_enabled           = optional(bool, false)
   }))
 }
 

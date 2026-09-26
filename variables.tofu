@@ -15,10 +15,10 @@ variable "labels" {
 
 variable "namespaces" {
   default     = {}
-  description = "A map of namespaces with an optional Google service account used for the namespace administrator and whether Istio injection is enabled or disabled"
+  description = "A map of namespaces with an optional Google service account used for the namespace administrator and whether the namespace is enrolled in the ambient Istio mesh"
   type = map(object({
     google_service_account = optional(string, null)
-    istio_injection        = optional(string, "disabled")
+    mesh_enabled           = optional(bool, false)
   }))
 }
 

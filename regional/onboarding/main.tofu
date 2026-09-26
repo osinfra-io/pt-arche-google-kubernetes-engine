@@ -14,7 +14,6 @@ resource "kubernetes_namespace_v1" "gatekeeper-system" {
   metadata {
     labels = {
       "admission.gatekeeper.sh/ignore" = "no-self-managing"
-      "istio-injection"                = "disabled"
     }
 
     name = "gatekeeper-system"
@@ -25,17 +24,22 @@ resource "kubernetes_namespace_v1" "this" {
   for_each = merge(
     var.namespaces,
     {
-      "cert-manager"  = { istio_injection = "disabled" },
-      "datadog"       = { istio_injection = "disabled" },
-      "istio-ingress" = { istio_injection = "enabled" },
-      "istio-system"  = { istio_injection = "disabled" }
+      "cert-manager"  = { mesh_enabled = false },
+      "datadog"       = { mesh_enabled = false },
+      "istio-ingress" = { mesh_enabled = false },
+      "istio-system"  = { mesh_enabled = false }
     }
   )
 
+  # topology.istio.io/network on istio-system is owned by the Istio workspace.
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels["topology.istio.io/network"]
+    ]
+  }
+
   metadata {
-    labels = {
-      "istio-injection" = each.value.istio_injection
-    }
+    labels = each.value.mesh_enabled ? { "istio.io/dataplane-mode" = "ambient" } : {}
 
     name = each.key
   }
