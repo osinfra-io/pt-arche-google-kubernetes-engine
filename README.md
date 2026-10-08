@@ -19,7 +19,7 @@ Reusable OpenTofu child module that provisions a GKE cluster with Workload Ident
 Regional clusters default to the `REGULAR` release channel with deletion protection, private nodes, Workload Identity, Shielded Nodes, Advanced Datapath, GKE cost allocation, and CMEK for cluster databases and node boot disks. Gateway API, fleet-host behavior, node pools, and node auto-provisioning are opt-in. KMS keys can make cluster data unrecoverable if their key versions are destroyed, and the child module cannot enforce consumer-side lifecycle protection. GKE clusters, nodes, control-plane features, logging/monitoring, and KMS usage incur GCP costs.
 
 > [!TIP]
-> You can check the [tests/fixtures](tests/fixtures) directory for example configurations. These fixtures set up the system for testing by providing all the necessary initial code, thus creating good examples on which to base your configurations.
+> See [tests/fixtures](tests/fixtures) for example configurations.
 
 Google project services must be enabled before using this module. As a best practice, these should be defined in the [pt-arche-google-project](https://github.com/osinfra-io/pt-arche-google-project) module. The following services are required:
 
@@ -39,8 +39,6 @@ Google project services must be enabled before using this module. As a best prac
 
 ## 📋 Skills and Knowledge
 
-Links to documentation and other resources required to develop and iterate in this repository successfully.
-
 - [kubernetes engine](https://cloud.google.com/kubernetes-engine/docs)
   - [multi cluster ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress)
   - [multi cluster service discovery](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-services)
@@ -52,7 +50,7 @@ Links to documentation and other resources required to develop and iterate in th
 
 ## 🔍 Tests
 
-All tests are [mocked](https://opentofu.org/docs/cli/commands/test/#the-mock_provider-blocks) allowing us to test the module without creating infrastructure or requiring credentials. The trade-offs are acceptable in favor of speed and simplicity. In an OpenTofu test, a mocked provider or resource will generate fake data for all computed attributes that would normally be provided by the underlying provider APIs.
+Tests use [mocked providers](https://opentofu.org/docs/cli/commands/test/#the-mock_provider-blocks); no infrastructure or credentials are required.
 
 ```none
 tofu init
