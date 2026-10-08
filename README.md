@@ -19,7 +19,7 @@ Reusable OpenTofu child module that provisions a GKE cluster with Workload Ident
 Regional clusters default to the `REGULAR` release channel with deletion protection, private nodes, Workload Identity, Shielded Nodes, Advanced Datapath, GKE cost allocation, and CMEK for cluster databases and node boot disks. Gateway API, fleet-host behavior, node pools, and node auto-provisioning are opt-in. KMS keys can make cluster data unrecoverable if their key versions are destroyed, and the child module cannot enforce consumer-side lifecycle protection. GKE clusters, nodes, control-plane features, logging/monitoring, and KMS usage incur GCP costs.
 
 > [!TIP]
-> See [tests/fixtures](tests/fixtures) for example configurations.
+> You can check the [tests/fixtures](tests/fixtures) directory for example configurations. These fixtures set up the system for testing by providing all the necessary initial code, thus creating good examples on which to base your configurations.
 
 Google project services must be enabled before using this module. As a best practice, these should be defined in the [pt-arche-google-project](https://github.com/osinfra-io/pt-arche-google-project) module. The following services are required:
 
