@@ -64,6 +64,52 @@ run "gke_fleet_host_regional" {
   }
 }
 
+run "node_pool_surge_settings" {
+  command = plan
+
+  module {
+    source = "./regional"
+  }
+
+  variables {
+    cluster_prefix = "mock"
+    node_pools = {
+      default-pool = {
+        machine_type                     = "e2-standard-2"
+        max_node_count                   = 1
+        min_node_count                   = 0
+        node_count                       = 1
+        upgrade_settings_max_surge       = 2
+        upgrade_settings_max_unavailable = 3
+      }
+    }
+    private_endpoint_subnetwork = "mock-master-subnet"
+    project                     = "mock-project"
+    subnet                      = "mock-subnet"
+    vpc_host_project_id         = "mock-vpc-host-project"
+  }
+
+  assert {
+    condition     = google_container_node_pool.this["default-pool"].upgrade_settings[0].max_surge == 2
+    error_message = "The node pool max_surge input must be applied"
+  }
+
+  assert {
+    condition     = google_container_node_pool.this["default-pool"].upgrade_settings[0].max_unavailable == 3
+    error_message = "The node pool max_unavailable input must be applied"
+  }
+
+  assert {
+    condition     = google_container_node_pool.this["default-pool"].management[0].auto_repair
+    error_message = "Node pool auto-repair must remain enabled"
+  }
+
+  assert {
+    condition     = google_container_node_pool.this["default-pool"].management[0].auto_upgrade
+    error_message = "Node pool auto-upgrade must remain enabled"
+  }
+}
+
 run "gke_fleet_host_regional_onboarding" {
   command = apply
 
