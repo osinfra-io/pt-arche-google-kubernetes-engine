@@ -39,6 +39,8 @@ Google project services must be enabled before using this module. As a best prac
 
 ## 📋 Skills and Knowledge
 
+Links to documentation and other resources required to develop and iterate in this repository successfully.
+
 - [kubernetes engine](https://cloud.google.com/kubernetes-engine/docs)
   - [multi cluster ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress)
   - [multi cluster service discovery](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-services)
@@ -50,7 +52,7 @@ Google project services must be enabled before using this module. As a best prac
 
 ## 🔍 Tests
 
-Tests use [mocked providers](https://opentofu.org/docs/cli/commands/test/#the-mock_provider-blocks); no infrastructure or credentials are required.
+All tests are [mocked](https://opentofu.org/docs/cli/commands/test/#the-mock_provider-blocks) allowing us to test the module without creating infrastructure or requiring credentials. The trade-offs are acceptable in favor of speed and simplicity. In an OpenTofu test, a mocked provider or resource will generate fake data for all computed attributes that would normally be provided by the underlying provider APIs.
 
 ```none
 tofu init
