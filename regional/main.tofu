@@ -105,7 +105,7 @@ resource "google_container_cluster" "this" {
   # enabled on clusters that host Gateway resources (the pneuma gateway clusters).
 
   dynamic "gateway_api_config" {
-    for_each = var.enable_gateway_api ? [1] : []
+    for_each = local.gateway_api_configs
 
     content {
       channel = "CHANNEL_STANDARD"
@@ -203,7 +203,7 @@ resource "google_container_cluster" "this" {
   # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 
   workload_identity_config {
-    workload_pool = "${var.project}.svc.id.goog"
+    workload_pool = local.workload_pool
   }
 }
 
@@ -297,7 +297,7 @@ resource "google_gke_hub_membership" "clusters" {
   for_each = local.gke_hub_memberships
 
   authority {
-    issuer = "https://container.googleapis.com/v1/${each.value.cluster_id}"
+    issuer = each.value.issuer
   }
 
   endpoint {
@@ -341,20 +341,8 @@ resource "google_kms_crypto_key" "this" {
 
   key_ring        = google_kms_key_ring.cluster_encryption.id
   labels          = var.labels
-  name            = "${each.key}-${random_id.this.hex}"
+  name            = each.value.crypto_key_name
   rotation_period = "7776000s"
-
-  # We can't use the lifecycle block to prevent destroy on this resource for testing purposes.
-
-  # CryptoKeys cannot be deleted from Google Cloud Platform. Destroying a OpenTofu-managed CryptoKey will
-  # remove it from state and delete all CryptoKeyVersions, rendering the key unusable, but will not delete
-  # the resource from the project. When OpenTofu destroys these keys, any data previously encrypted with
-  # these keys will be irrecoverable. For this reason, it is strongly recommended that you add lifecycle
-  # hooks to the resource to prevent accidental destruction.
-
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
 }
 
 # KMS CryptoKey IAM Member Resource
@@ -373,17 +361,8 @@ resource "google_kms_crypto_key_iam_member" "this" {
 
 resource "google_kms_key_ring" "cluster_encryption" {
   location = module.core_helpers.region
-  name     = "${local.name}-cluster-encryption-${random_id.this.hex}"
+  name     = local.key_ring_name
   project  = var.project
-
-  # We can't use the lifecycle block to prevent destroy on this resource for testing purposes.
-
-  # KeyRings cannot be deleted from Google Cloud Platform. Destroying a OpenTofu-managed KeyRing will remove it from
-  # state but will not delete the resource from the project.
-
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
 }
 
 # CIS GKE Benchmark Recommendation: 6.2.1. Prefer not running GKE clusters using the Compute Engine
@@ -398,7 +377,7 @@ resource "google_kms_key_ring" "cluster_encryption" {
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_project_iam#google_project_iam_member
 
 resource "google_project_iam_member" "default_node" {
-  member  = "serviceAccount:${google_service_account.default_node.email}"
+  member  = local.default_node_member
   project = var.project
   role    = "roles/container.defaultNodeServiceAccount"
 }
@@ -407,8 +386,8 @@ resource "google_project_iam_member" "default_node" {
 # https://search.opentofu.org/provider/hashicorp/google/latest/docs/resources/google_service_account
 
 resource "google_service_account" "default_node" {
-  account_id   = "gke-${random_id.this.hex}"
-  display_name = "Kubernetes minimum privilege service account for: ${local.name}"
+  account_id   = local.default_node_account_id
+  display_name = local.default_node_display_name
   project      = var.project
 }
 

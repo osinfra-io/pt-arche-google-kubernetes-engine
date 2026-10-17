@@ -21,15 +21,7 @@ resource "kubernetes_namespace_v1" "gatekeeper-system" {
 }
 
 resource "kubernetes_namespace_v1" "this" {
-  for_each = merge(
-    var.namespaces,
-    {
-      "cert-manager"  = { mesh_enabled = false },
-      "datadog"       = { mesh_enabled = false },
-      "istio-ingress" = { mesh_enabled = false },
-      "istio-system"  = { mesh_enabled = false }
-    }
-  )
+  for_each = local.kubernetes_namespaces
 
   # topology.istio.io/network on istio-system is owned by the Istio workspace.
   lifecycle {
@@ -39,7 +31,7 @@ resource "kubernetes_namespace_v1" "this" {
   }
 
   metadata {
-    labels = each.value.mesh_enabled ? { "istio.io/dataplane-mode" = "ambient" } : {}
+    labels = each.value.labels
 
     name = each.key
   }
@@ -97,7 +89,7 @@ resource "kubernetes_service_account_v1" "workload_identities" {
       "iam.gke.io/gcp-service-account" = data.google_service_account.workload_identities[each.key].email
     }
 
-    name      = "${each.key}-workload-identity-sa"
+    name      = local.workload_identity_service_account_names[each.key]
     namespace = kubernetes_namespace_v1.this[each.key].metadata.0.name
   }
 }
