@@ -32,6 +32,5 @@ module "test" {
   source = "../../../../regional/onboarding"
 
   namespaces                               = var.namespaces
-  project                                  = var.project
   workload_identity_service_account_emails = data.terraform_remote_state.main.outputs.workload_identity_service_account_emails
 }

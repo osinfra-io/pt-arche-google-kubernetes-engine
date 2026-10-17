@@ -6,9 +6,3 @@ variable "namespaces" {
 
   type = map(any)
 }
-
-variable "project" {
-  description = "The Google Cloud project ID"
-
-  type = string
-}

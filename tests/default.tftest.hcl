@@ -116,10 +116,6 @@ run "gke_fleet_host_regional_onboarding" {
   module {
     source = "./tests/fixtures/gke_fleet_host/regional_onboarding"
   }
-
-  variables {
-    project = "mock-project-host-project"
-  }
 }
 
 
@@ -167,10 +163,6 @@ run "gke_fleet_member_regional_onboarding" {
 
   module {
     source = "./tests/fixtures/gke_fleet_member/regional_onboarding"
-  }
-
-  variables {
-    project = "mock-project-member-project"
   }
 }
 
