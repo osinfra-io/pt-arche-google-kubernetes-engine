@@ -30,7 +30,22 @@ locals {
 
   cluster_autoscaling_upgrade_settings = var.cluster_autoscaling.upgrade_settings_strategy == "SURGE" || var.cluster_autoscaling.upgrade_settings_strategy == "BLUE_GREEN" ? [var.cluster_autoscaling.upgrade_settings_strategy] : []
 
-  gke_hub_memberships = var.enable_gke_hub_host ? var.gke_hub_memberships : {}
+  default_node_account_id   = "gke-${random_id.this.hex}"
+  default_node_display_name = "Kubernetes minimum privilege service account for: ${local.name}"
+  default_node_member       = "serviceAccount:${google_service_account.default_node.email}"
+
+  enabled_gke_hub_memberships = var.enable_gke_hub_host ? var.gke_hub_memberships : {}
+
+  gateway_api_configs = var.enable_gateway_api ? [1] : []
+
+  gke_hub_memberships = {
+    for k, v in local.enabled_gke_hub_memberships : k => {
+      cluster_id = v.cluster_id
+      issuer     = "https://container.googleapis.com/v1/${v.cluster_id}"
+    }
+  }
+
+  key_ring_name = "${local.name}-cluster-encryption-${random_id.this.hex}"
 
   kms_crypto_keys = {
     cluster-boot-disk-encryption = {
@@ -39,10 +54,12 @@ locals {
       # which requires permissions to do encryption using your Cloud KMS key. This is true even if you are using a custom service
       # account on your nodes.
 
+      crypto_key_name = "cluster-boot-disk-encryption-${random_id.this.hex}"
       service_account = "serviceAccount:service-${data.google_project.this.number}@compute-system.iam.gserviceaccount.com"
     }
 
     cluster-database-encryption = {
+      crypto_key_name = "cluster-database-encryption-${random_id.this.hex}"
       service_account = "serviceAccount:service-${data.google_project.this.number}@container-engine-robot.iam.gserviceaccount.com"
     }
   }
@@ -54,4 +71,6 @@ locals {
   private_endpoint_subnetwork = "projects/${var.vpc_host_project_id}/regions/${module.core_helpers.region}/subnetworks/${var.private_endpoint_subnetwork}"
 
   subnet = "projects/${var.vpc_host_project_id}/regions/${module.core_helpers.region}/subnetworks/${var.subnet}"
+
+  workload_pool = "${var.project}.svc.id.goog"
 }
