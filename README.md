@@ -10,6 +10,8 @@ Reusable OpenTofu child module that provisions a GKE cluster with Workload Ident
 
 Destroying KMS key versions can make cluster data unrecoverable. Configure lifecycle protection in the consuming root module; this child module does not enforce it.
 
+New clusters require GKE `1.36.4-gke.1469000` or later. They are created without a default node pool; node pools are managed separately rather than creating and deleting a bootstrap pool.
+
 > [!TIP]
 > You can check the [tests/fixtures](tests/fixtures) directory for example configurations. These fixtures set up the system for testing by providing all the necessary initial code, thus creating good examples on which to base your configurations.
 

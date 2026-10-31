@@ -112,6 +112,8 @@ resource "google_container_cluster" "this" {
     }
   }
 
+  initial_node_count = 0
+
   ip_allocation_policy {
     cluster_secondary_range_name  = "k8s-secondary-pods"
     services_secondary_range_name = "k8s-secondary-services"
@@ -189,9 +191,8 @@ resource "google_container_cluster" "this" {
     channel = var.release_channel
   }
 
-  remove_default_node_pool = true
-  resource_labels          = var.resource_labels
-  subnetwork               = local.subnet
+  resource_labels = var.resource_labels
+  subnetwork      = local.subnet
 
   # Workload Identity allows workloads in your GKE clusters to impersonate Identity and Access Management (IAM) service accounts
   # to access Google Cloud services.
