@@ -108,6 +108,11 @@ run "node_pool_surge_settings" {
     condition     = google_container_node_pool.this["default-pool"].management[0].auto_upgrade
     error_message = "Node pool auto-upgrade must remain enabled"
   }
+
+  assert {
+    condition     = google_container_cluster.this.initial_node_count == null && google_container_cluster.this.remove_default_node_pool
+    error_message = "Clusters must omit the deprecated default-pool bootstrap count and use separately managed node pools."
+  }
 }
 
 run "gke_fleet_host_regional_onboarding" {
