@@ -112,11 +112,6 @@ resource "google_container_cluster" "this" {
     }
   }
 
-  # If you're using google_container_node_pool objects with no default node pool, you'll need to set this to a value
-  # of at least 1, alongside setting remove_default_node_pool to true.
-
-  initial_node_count = 1
-
   ip_allocation_policy {
     cluster_secondary_range_name  = "k8s-secondary-pods"
     services_secondary_range_name = "k8s-secondary-services"

@@ -30,8 +30,7 @@ run "gke_fleet_host" {
   }
 
   variables {
-    project                    = "mock-project-host-project"
-    shared_vpc_host_project_id = "mock-vpc-host-project"
+    project = "mock-project-host-project"
   }
 }
 
@@ -108,6 +107,11 @@ run "node_pool_surge_settings" {
     condition     = google_container_node_pool.this["default-pool"].management[0].auto_upgrade
     error_message = "Node pool auto-upgrade must remain enabled"
   }
+
+  assert {
+    condition     = google_container_cluster.this.initial_node_count == null && google_container_cluster.this.remove_default_node_pool
+    error_message = "Clusters must omit the deprecated default-pool bootstrap count and use separately managed node pools."
+  }
 }
 
 run "gke_fleet_host_regional_onboarding" {
@@ -127,9 +131,8 @@ run "gke_fleet_member" {
   }
 
   variables {
-    gke_fleet_host_project_id  = "mock-fleet-host-project"
-    project                    = "mock-project-member-project"
-    shared_vpc_host_project_id = "mock-vpc-host-project"
+    gke_fleet_host_project_id = "mock-fleet-host-project"
+    project                   = "mock-project-member-project"
   }
 }
 
@@ -167,8 +170,6 @@ run "gke_fleet_member_regional_onboarding" {
 }
 
 variables {
-  google_service_account = "mock@mock.iam.gserviceaccount.com"
-
   namespaces = {
     namespace-a = {
       google_service_account = "mock-github@mock.gserviceaccount.com"
