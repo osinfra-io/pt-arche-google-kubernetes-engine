@@ -109,8 +109,8 @@ run "node_pool_surge_settings" {
   }
 
   assert {
-    condition     = google_container_cluster.this.initial_node_count == null && google_container_cluster.this.remove_default_node_pool
-    error_message = "Clusters must omit the deprecated default-pool bootstrap count and use separately managed node pools."
+    condition     = google_container_cluster.this.initial_node_count == 0
+    error_message = "Clusters must be created without a default node pool and use separately managed node pools."
   }
 }
 
