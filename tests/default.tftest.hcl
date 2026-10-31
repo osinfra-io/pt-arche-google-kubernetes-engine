@@ -30,8 +30,7 @@ run "gke_fleet_host" {
   }
 
   variables {
-    project                    = "mock-project-host-project"
-    shared_vpc_host_project_id = "mock-vpc-host-project"
+    project = "mock-project-host-project"
   }
 }
 
@@ -132,9 +131,8 @@ run "gke_fleet_member" {
   }
 
   variables {
-    gke_fleet_host_project_id  = "mock-fleet-host-project"
-    project                    = "mock-project-member-project"
-    shared_vpc_host_project_id = "mock-vpc-host-project"
+    gke_fleet_host_project_id = "mock-fleet-host-project"
+    project                   = "mock-project-member-project"
   }
 }
 
@@ -172,8 +170,6 @@ run "gke_fleet_member_regional_onboarding" {
 }
 
 variables {
-  google_service_account = "mock@mock.iam.gserviceaccount.com"
-
   namespaces = {
     namespace-a = {
       google_service_account = "mock-github@mock.gserviceaccount.com"
